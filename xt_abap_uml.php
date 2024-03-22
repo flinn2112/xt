@@ -134,7 +134,8 @@ function processCode($strFilename, $strCode, &$ht_classes, &$ht_interfaces){
     Eingang ist eine Liste in einem String, Klassenname und folgend Methoden durch ";" getrennt.
     
 */
-function createClass($strContents, $ht_interfaces, $bMethodsOnly){
+function createClass($strContents, $ht_interfaces, $strPrefix,  //für interfaces
+                           $bMethodsOnly){
 
     $strMethods = "" ;
     $strContents = preg_replace("/;;/", ";", $strContents) ; //leere weg
@@ -146,15 +147,21 @@ function createClass($strContents, $ht_interfaces, $bMethodsOnly){
         
         //fängt mit dem 2.ten Element an, erstes ist die Klasse.
         for($i = 1; $i < count($rParts);$i++){
-            printf("createClass: Part [%s]\n", $rParts[$i] ) ;
+            
             if( empty($rParts[$i])) continue ;
+            
             //möglicherweise referiert der Eintrag ein Interface
             $strName = preg_replace("/^[\+\-\#]/", "", $rParts[$i]); //die Modifier könnten drin stehen - muss weg
-            if( isset($ht_interfaces[$strName])){
+            if( isset($ht_interfaces[$strName])){                
                 printf("createClass: Found Interface [%s] Value: %s\n", $strName, $ht_interfaces[$strName] ) ;
-                $strMethods = $strMethods. createClass($ht_interfaces[$strName], $ht_interfaces, TRUE) ;
+                $strMethods = $strMethods. createClass($ht_interfaces[$strName], $ht_interfaces, $rParts[$i]. "~", TRUE) ;
+                printf("createClass: Appending Interface Methods [%s] Pref: %s\n", $strMethods, $rParts[$i] ) ;
             }else{
-                $strMethods =  $rParts[$i]. "\n" ;
+                if( empty($strPrefix))
+                    $strMethods =  $strMethods. $rParts[$i]. "\n" ;
+                else
+                    $strMethods =  $strMethods. $strPrefix. $rParts[$i]. "\n" ;
+                printf("createClass: Part [%s]\n", $rParts[$i] ) ;
             }
             
         }        
@@ -263,7 +270,7 @@ function collectStuff($strPath, $strPackageName){
     printf("=========================================%s=============================================\n", $strPackageName) ;
     foreach ($ht_classes as $x){
             //printf("[%d] ---  %s\n", $iCount++, $x) ;
-            $strClasses = createClass($x, $ht_interfaces, FALSE) ;
+            $strClasses = createClass($x, $ht_interfaces, NULL, FALSE) ;
             print($strClasses) ;
         }
     print("======================================================================================\n") ;    
