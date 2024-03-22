@@ -13,7 +13,7 @@
    in die Klasse ein.
    Das bedingt aber, dass das Interface vorher eingesammelt wurde - also Interfaces first.
 */
-function processCode($strCode, &$ht_classes){ 
+function processCode($strCode, &$ht_classes, &$ht_interfaces){ 
     $strClassDefs = "" ;
     $strCurrSection = "" ;  //public private usw.
     $strMethods = "" ;
@@ -56,7 +56,7 @@ function processCode($strCode, &$ht_classes){
          Aber - da kann dann richtig noch was dranhängen - 
 
     */
-
+    //Klasse im String:
     if ( preg_match("/\s*class\s+[A-Za-z\/_0-9]*\s*definition/i", $strCode, $matches) ) {
         //den Klassennamen isolieren
            //printf("---MATCH:\n %s\n", $matches[0]) ;
@@ -92,11 +92,21 @@ function processCode($strCode, &$ht_classes){
             printf("inserting [%s] \n", sprintf( "%s;%s",  $strClassname, $strMethods)) ;
             }
         }
-
+        
 
 
         //print("\n") ;
-    }
+    } //class
+
+    //Interface im String:
+    if ( preg_match("/^\s*interface\s+[A-Za-z\/_0-9]*/i", $strCode, $matches) ) {
+        foreach( $ht_methods as $m){
+            $strMethods = $strMethods. "\n". $m ;
+        }
+        $strClassname = preg_replace("/\s*interface\s*/", "", $matches[0]) ;
+        printf("inserting  I N T E R F A C E  [%s] \n", sprintf( "%s;%s",  $strClassname, $strMethods)) ;
+        $ht_interfaces[$strClassname] = sprintf( "%s", $strMethods);  //insert
+     }
     
 
 
@@ -122,7 +132,9 @@ function createClass($strContents){
 
 //200324 - über File *.CI anfangen
 /*
-Die Methoden dieses Interfaces müssen dann eingesammelt werden und gehen als Methoden
+Aufsammeln von Klassen und Interfaces.
+zu CP/IP Dateien werden die Includes gesammelt und prozessiert.
+Die Methoden der Interfaces müssen dann eingesammelt werden und gehen als Methoden
    in die Klasse ein.
    Das bedingt aber, dass das Interface vorher eingesammelt wurde - also Interfaces first.
 
@@ -133,7 +145,8 @@ function collectStuff($strPath, $strPackageName){
     $strContentInterfaces = "" ;  //interfaces getrennt, dann als erstes in den Gesamtstring
     $bIsInterface = FALSE ;
     $d = dir($strPath);
-    $ht_classes = array() ;
+    $ht_classes     = array() ;
+    $ht_interfaces  = array() ;
     $iCount = 0 ;
     while (($file = $d->read()) !== false){
         $iCount++ ;        
@@ -151,7 +164,7 @@ function collectStuff($strPath, $strPackageName){
                 $bIsInterface = TRUE ;
             }
             else{ //
-                printf("File not matching : %s\n", $file) ;
+                printf("File not matching *cp.aba or *ip.aba: %s\n", $file) ;
                 continue ; //überspringen
             }
         
@@ -183,20 +196,23 @@ printf("%s filtered out\n", $fName) ;
                 }
             }
             $strContentAll = $strContentInterfaces. "\n". $strContentAll;
-            
-            
-        //    processCode($strContentAll, $ht_classes) ; 
+            processCode($strContentAll, $ht_classes, $ht_interfaces) ; 
              
-            
-            //$strContentAll = "" ;
-            
-            //break ;   
+            //muss natürlich leer sein vor nächstem Durchlauf.
+            $strContentAll = "" ;            
+//break ;   
            
         //if( $iCount > 15 ) break;
+        print("======================================================================================\n") ; 
+        print_r($ht_interfaces) ;
+        print("======================================================================================\n") ; 
+
        }
     } //while
 
-    print($strContentAll) ;
+    
+return ;
+    //print($strContentAll) ;
 
     //sort($ht_classes) ;
     printf("=========================================%s=============================================\n", $strPackageName) ;
