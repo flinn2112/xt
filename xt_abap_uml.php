@@ -13,13 +13,18 @@
    in die Klasse ein.
    Das bedingt aber, dass das Interface vorher eingesammelt wurde - also Interfaces first.
 */
-function processCode($strCode, &$ht_classes, &$ht_interfaces){ 
+function processCode($strFilename, $strCode, &$ht_classes, &$ht_interfaces){ 
     $strClassDefs = "" ;
     $strCurrSection = "" ;  //public private usw.
     $strMethods = "" ;
     $ht_methods = array() ;    
     //Zeilen splitten
     $strToken = strtok($strCode, "\n");
+
+    printf("=================================PROCESSCODE==========%s===========================================\n", $strFilename) ;
+   
+    
+
     while ($strToken !== false) {
         if( str_contains($strToken, "public section")) $strCurrSection = "+" ;
         if( str_contains($strToken, "private section")) $strCurrSection = "-" ;
@@ -38,10 +43,19 @@ function processCode($strCode, &$ht_classes, &$ht_interfaces){
 
         if( preg_match("/\s*methods\s*/i", $strToken) ){
             $strToken = preg_replace("/\s*methods\s*/i", "", $strToken) ;
-            printf( "PROCESSCODE Method found: %s%s", $strCurrSection, $strToken);
-            $ht_methods[$strToken] = $strCurrSection. $strToken ;
-            
+            $strToken = preg_replace("/\s*|\./", "", $strToken) ;  //" ." am ende weg
+            printf( "PROCESSCODE Method found: %s%s\n", $strCurrSection, $strToken);
+            $ht_methods[$strToken] = $strCurrSection. $strToken ;            
         }
+      
+        if( preg_match("/\s*interfaces.*\.\s*/i", $strToken) ){
+            $strToken = trim($strToken) ;            
+            $strToken = preg_replace("/\s*interfaces\s*/i", "", $strToken) ;
+            $strToken = preg_replace("/\s*|\./", "", $strToken) ;  //" ." am ende weg
+            printf( "PROCESSCODE Interface found: %s%s\n", $strCurrSection, $strToken);
+            $ht_methods[$strToken] = $strCurrSection. $strToken ;            
+        }
+
       
       $strToken = strtok("\n");
     }
@@ -86,14 +100,14 @@ function processCode($strCode, &$ht_classes, &$ht_interfaces){
             
             }else{
             foreach( $ht_methods as $m){
-                $strMethods = $strMethods. "\n". $m ;
+                $strMethods = $strMethods. ";". $m ;
             }
             $ht_classes[$strClassname] = sprintf( "%s;%s",  $strClassname, $strMethods);  //insert
-            printf("inserting [%s] \n", sprintf( "%s;%s",  $strClassname, $strMethods)) ;
+            printf("inserting class [%s] \n", sprintf( "%s;%s",  $strClassname, $strMethods)) ;
             }
         }
         
-
+        print("======================================================================================\n") ; //processcode
 
         //print("\n") ;
     } //class
@@ -101,11 +115,11 @@ function processCode($strCode, &$ht_classes, &$ht_interfaces){
     //Interface im String:
     if ( preg_match("/^\s*interface\s+[A-Za-z\/_0-9]*/i", $strCode, $matches) ) {
         foreach( $ht_methods as $m){
-            $strMethods = $strMethods. "\n". $m ;
+            $strMethods = $strMethods. ";". $m ;
         }
         $strClassname = preg_replace("/\s*interface\s*/", "", $matches[0]) ;
         printf("inserting  I N T E R F A C E  [%s] \n", sprintf( "%s;%s",  $strClassname, $strMethods)) ;
-        $ht_interfaces[$strClassname] = sprintf( "%s", $strMethods);  //insert
+        $ht_interfaces[$strClassname] = sprintf( "%s;%s",  $strClassname, $strMethods);  //insert
      }
     
 
@@ -116,17 +130,40 @@ function processCode($strCode, &$ht_classes, &$ht_interfaces){
 //plantUML
 //Weiterentwicklung: 
 //Methoden kamen dazu, deshalb muss der Eingangsstring aufgetrennt werden.
-function createClass($strContents){
-    $strMethods = "" ;
-    $rParts = explode(";", $strContents) ;
-    if( empty($rParts[1])  ){
-
-  //      print("Parts empty\n") ;
-    }else{
-        $strMethods =  $rParts[1] ;
-    }
+/*
+    Eingang ist eine Liste in einem String, Klassenname und folgend Methoden durch ";" getrennt.
     
-    printf("class %s {\n%s } \n", $rParts[0], $strMethods    ) ;
+*/
+function createClass($strContents, $ht_interfaces, $bMethodsOnly){
+
+    $strMethods = "" ;
+    $strContents = preg_replace("/;;/", ";", $strContents) ; //leere weg
+    printf("createClass - received: %s\n", $strContents) ;
+    $rParts = explode(";", $strContents) ;
+    if( 0 == count($rParts)  ){ //keine Methoden drin
+        printf("Parts empty: [%s]\n", $strContents ) ;
+    }else{
+        
+        //fängt mit dem 2.ten Element an, erstes ist die Klasse.
+        for($i = 1; $i < count($rParts);$i++){
+            printf("createClass: Part [%s]\n", $rParts[$i] ) ;
+            if( empty($rParts[$i])) continue ;
+            //möglicherweise referiert der Eintrag ein Interface
+            $strName = preg_replace("/^[\+\-\#]/", "", $rParts[$i]); //die Modifier könnten drin stehen - muss weg
+            if( isset($ht_interfaces[$strName])){
+                printf("createClass: Found Interface [%s] Value: %s\n", $strName, $ht_interfaces[$strName] ) ;
+                $strMethods = $strMethods. createClass($ht_interfaces[$strName], $ht_interfaces, TRUE) ;
+            }else{
+                $strMethods =  $rParts[$i]. "\n" ;
+            }
+            
+        }        
+    }
+    if( TRUE == $bMethodsOnly ){
+        //ohne umgebende class
+        return sprintf("%s\n",  $strMethods ) ;
+    }else
+        return sprintf("class %s {\n%s } \n", $rParts[0], $strMethods ) ;
 //print_r($rParts);
 }
 
@@ -150,6 +187,9 @@ function collectStuff($strPath, $strPackageName){
     $iCount = 0 ;
     while (($file = $d->read()) !== false){
         $iCount++ ;        
+        //muss natürlich leer sein vor nächstem Durchlauf.
+        $strContentAll = "" ;    
+        $strContentInterfaces = "" ;        
         if( is_dir($file) ){
             
         }
@@ -182,13 +222,19 @@ function collectStuff($strPath, $strPackageName){
                 $fName = preg_replace("/\/XTN\//i", "", $fName ) ;
                 printf("INCLUDE FOUND: %s\n", $fName);  
                 if( preg_match("/ccau\s*$/i", $fName)){
-printf("%s filtered out\n", $fName) ;
+                    printf("%s filtered out\n", $fName) ;
                     continue ;
-
                 }
                 //print($matches[0]. "\n") ;
                 //Alle includes werden in einen String eingesammel
                 $fName = sprintf("%s\\%s.aba", $strPath, $fName) ;
+                if( !file_exists($fName)){
+                    printf("collectStuff File [%s] not found - skipped \n", $fName) ;
+                    
+                    continue ; //for
+                } 
+
+
                 if( TRUE == $bIsInterface){
                     $strContentInterfaces = $strContentInterfaces. file_get_contents($fName) ;
                 }else{
@@ -196,10 +242,9 @@ printf("%s filtered out\n", $fName) ;
                 }
             }
             $strContentAll = $strContentInterfaces. "\n". $strContentAll;
-            processCode($strContentAll, $ht_classes, $ht_interfaces) ; 
+            processCode($strPackageName, $strContentAll, $ht_classes, $ht_interfaces) ; 
              
-            //muss natürlich leer sein vor nächstem Durchlauf.
-            $strContentAll = "" ;            
+                
 //break ;   
            
         //if( $iCount > 15 ) break;
@@ -211,14 +256,15 @@ printf("%s filtered out\n", $fName) ;
     } //while
 
     
-return ;
+
     //print($strContentAll) ;
 
     //sort($ht_classes) ;
     printf("=========================================%s=============================================\n", $strPackageName) ;
     foreach ($ht_classes as $x){
             //printf("[%d] ---  %s\n", $iCount++, $x) ;
-            createClass($x) ;
+            $strClasses = createClass($x, $ht_interfaces, FALSE) ;
+            print($strClasses) ;
         }
     print("======================================================================================\n") ;    
 }
