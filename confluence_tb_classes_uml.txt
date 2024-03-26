@@ -1,5 +1,8 @@
 MCI-Komponenten für Timerbee
 @startuml
+
+
+
 package "/XTN/OEHS_TB_MCI"{ 
 
 class "/XTN/CL_OEHS_TB_MCI_LOKI" extends "CL_APC_WSP_EXT_STATELESS_BASE" {
@@ -183,13 +186,39 @@ class "/XTN/CL_OEHS_TB_MCI_MSG_BUILD"  {
 -CREATE_PV1
 -CREATE_TXA
  } 
+
+
+class "/XTN/CX_OEHS_TB_MCI" extends "CX_ISHMED_MCI" {
+
++CONSTRUCTOR
+ }  
+
+
+
+}
+@enduml
+
+
+
+
+@startuml
+
+
+package "TRANSFORMER"{
+
+
 class "/XTN/CL_OEHS_TB_MCI_PURPOSE"  {
 
 +IF_ISHMED_OBJECT~FINALIZE
 +IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
 +IF_ISHMED_MCI_COMPONENT~INIT
+}
 
- } 
+note top of  "/XTN/CL_OEHS_TB_MCI_PURPOSE"  
+Transformer für Ressource "Resource"
+end note  
+
+ 
 class "/XTN/CL_OEHS_TB_MCI_RESOURCE"  {
 +IF_ISHMED_OBJECT~FINALIZE
 +IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
@@ -222,28 +251,15 @@ class "/XTN/CL_OEHS_TB_MCI_TIMELINE" {
 +IF_ISHMED_OBJECT~FINALIZE
 +IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
 +IF_ISHMED_MCI_COMPONENT~INIT
+}
 
- } 
-
-class "/XTN/CX_OEHS_TB_MCI" extends "CX_ISHMED_MCI" {
-
-+CONSTRUCTOR
- }  
-
-
-
+note top of "/XTN/CL_OEHS_TB_MCI_TIMELINE"
+Transformer für Ressource "Timeline"
+end note
+      
 }
 @enduml
 API für Timerbee
-
-
-
-
-
-
-Adapter
-
-
 
 Adapter werden in die Mapper-Klassen eingehängt. Über diese Adapter kann dann der Mapper Daten auf Anfrage in ABAP-Strukturen übertragen.  
 
