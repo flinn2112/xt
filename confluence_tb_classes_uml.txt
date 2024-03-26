@@ -1,0 +1,816 @@
+MCI-Komponenten für Timerbee
+@startuml
+package "/XTN/OEHS_TB_MCI"{ 
+
+class "/XTN/CL_OEHS_TB_MCI_LOKI" extends "CL_APC_WSP_EXT_STATELESS_BASE" {
+ } 
+note top of "/XTN/CL_OEHS_TB_MCI_LOKI"
+"Anbindung an Grafana Loki"
+Grafana ist eine plattformübergreifende Open-Source-Anwendung 
+zur grafischen Darstellung 
+von Daten aus verschiedenen Datenquellen 
+wie z. B. InfluxDB, MySQL, PostgreSQL, Prometheus und Graphite.
+end note
+
+
+class "/xtn/cl_oehs_tb_mci_connector"  {
+
++IF_ISHMED_MCI_END_CONNECTOR~SEND
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_START_CONNECTOR~RECEIVE
++IF_ISHMED_MCI_START_CONNECTOR~RESTART
++IF_ISHMED_MCI_COMPONENT~INIT
+
+ } 
+class "/XTN/CL_OEHS_TB_MCI_ENGINE"  {
+
++CONSTRUCTOR
++DO .
+ } 
+class "/XTN/CL_OEHS_TB_MCI_LOG_ADPTR"  {
+
++CONSTRUCTOR
+ } 
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE"  {
+
++CONSTRUCTOR
++GET_ENDPOINT
++GET_INSTITUTION_ID
++GET_METHOD
++GET_RESPONSE
++GET_URI_ATTRIBUTES
++GET_URI_FRAGMENT
++GET_URI_PATH
++GET_URI_QUERY_PARAMETERS
++GET_URI_SEGMENTS
++SET_RESPONSE
+#ADJUST_BEFORE_DISPLAY
+ } 
+
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE"
+Timerbee MCI-Nachricht
+end note
+
+ class "/XTN/CL_OEHS_TB_MCI_MESSAGE_01" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
+
++CONSTRUCTOR
++GET_DATA
++SET_DATA
++IF_ISHMED_OBJECT~FINALIZE
+#ADJUST_BEFORE_DISPLAY
+ } 
+
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_01"
+MCI-Nachricht für Endpunkt "System"
+end note
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_02" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
+
++CONSTRUCTOR
+ } 
+
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_02"
+
+MCI-Nachricht für Endpunkt "ResourceGroup"
+
+end note
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_03" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
+
++CONSTRUCTOR
+ } 
+
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_03"
+
+MCI-Nachricht für Endpunkt "Resource"
+
+end note 
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_04" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
+
++CONSTRUCTOR
+ } 
+
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_04"
+
+MCI-Nachricht für Endpunkt "Purpose"
+
+end note
+
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_05" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
+
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_MESSAGE~DISPLAY
++IF_ISHMED_MCI_MESSAGE~EDIT
++GET_ENDPOINT
++GET_INSTITUTION_ID
++GET_METHOD
++GET_RESPONSE
++GET_URI_ATTRIBUTES
++GET_URI_FRAGMENT
++GET_URI_PATH
++GET_URI_QUERY_PARAMETERS
++GET_URI_SEGMENTS
++SET_RESPONSE
++ADJUST_BEFORE_DISPLAY
+CONSTRUCTOR
++GET_DATA
++SET_DATA
+
++CONSTRUCTOR
+#ADJUST_BEFORE_DISPLAY
+ } 
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_05"
+
+MCI-Nachricht für Endpunkt "Timeline"
+
+end note
+
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_06" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE_05" {
+
+} 
+
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_06"
+
+MCI-Nachricht für Endpunkt "Timeline" Methode GET
+
+end note
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_07" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE_05" {
+
++CONSTRUCTOR
++GET_MESSAGE_BODY
+
+ } 
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_07"
+
+MCI-Nachricht für Endpunkt "Timeline" Methode POST
+
+
+end note
+
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_08" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE_05" {
+
++CONSTRUCTOR
++GET_MESSAGE_BODY
+
+ } 
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_08"
+
+MCI-Nachricht für Endpunkt "Timeline" Methode PUT
+
+end note
+
+
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_09" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE_05" {
+ } 
+note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_09"
+
+MCI-Nachricht für Endpunkt "Timeline" Methode DELETE
+
+end note 
+class "/XTN/CL_OEHS_TB_MCI_MSG_BUILD"  {
+
++CONSTRUCTOR
++EXECUTE
+-CREATE_EVN
+-CREATE_MSH
+-CREATE_OBX
+-CREATE_PID
+-CREATE_PV1
+-CREATE_TXA
+ } 
+class "/XTN/CL_OEHS_TB_MCI_PURPOSE"  {
+
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
++IF_ISHMED_MCI_COMPONENT~INIT
+
+ } 
+class "/XTN/CL_OEHS_TB_MCI_RESOURCE"  {
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
++IF_ISHMED_MCI_COMPONENT~INIT
+} 
+note top of  "/XTN/CL_OEHS_TB_MCI_RESOURCE"  
+Transformer für Ressource "Resource"
+end note 
+
+class "/XTN/CL_OEHS_TB_MCI_RES_GROUP"  {
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
++IF_ISHMED_MCI_COMPONENT~INIT
+} 
+note top of "/XTN/CL_OEHS_TB_MCI_RES_GROUP"
+Transformer für Ressource "ResourceGroup"
+end note
+
+class "/XTN/CL_OEHS_TB_MCI_SYSTEM"  {
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
++IF_ISHMED_MCI_COMPONENT~INIT
+ } 
+
+note top of "/XTN/CL_OEHS_TB_MCI_SYSTEM"
+Transformer für Ressource "System"  
+end note
+
+class "/XTN/CL_OEHS_TB_MCI_TIMELINE" {
++IF_ISHMED_OBJECT~FINALIZE
++IF_ISHMED_MCI_TRANSFORMER~TRANSFORM
++IF_ISHMED_MCI_COMPONENT~INIT
+
+ } 
+
+class "/XTN/CX_OEHS_TB_MCI" extends "CX_ISHMED_MCI" {
+
++CONSTRUCTOR
+ }  
+
+
+
+}
+@enduml
+API für Timerbee
+
+
+
+
+
+
+Adapter
+
+
+
+Adapter werden in die Mapper-Klassen eingehängt. Über diese Adapter kann dann der Mapper Daten auf Anfrage in ABAP-Strukturen übertragen.  
+
+@startuml
+package "/XTN/OEHS_TB_API"{
+
+class "/XTN/CL_OEHS_TB_API_APPT"  {
+
++CONSTRUCTOR .
++/XTN/IF_OEHS_TB_API_APPT~CANCEL_APPOINTMENT
++/XTN/IF_OEHS_TB_API_APPT~CHANGE_APPOINTMENT
++/XTN/IF_OEHS_TB_API_APPT~CHANGE_PATIENT
++/XTN/IF_OEHS_TB_API_APPT~CHECK_APPT_AUTHORIZATION
++/XTN/IF_OEHS_TB_API_APPT~CREATE_APPOINTMENT
++/XTN/IF_OEHS_TB_API_APPT~CREATE_NOTE
++/XTN/IF_OEHS_TB_API_APPT~CREATE_PATIENT
++/XTN/IF_OEHS_TB_API_APPT~DEQUEUE
++/XTN/IF_OEHS_TB_API_APPT~END_PLANNING
++/XTN/IF_OEHS_TB_API_APPT~ENQUEUE
++/XTN/IF_OEHS_TB_API_APPT~READ_APPOINTMENT
++/XTN/IF_OEHS_TB_API_APPT~READ_APPOINTMENTS
++/XTN/IF_OEHS_TB_API_APPT~READ_PARTICIPANT
++/XTN/IF_OEHS_TB_API_APPT~READ_PATIENT
++/XTN/IF_OEHS_TB_API_APPT~SAVE_PARTICIPANT
++/XTN/IF_OEHS_TB_API_APPT~START_PLANNING
+-RAISE_WF_EVENT
+ } 
+
+class "/xtn/cl_oehs_tb_api_config"  {
+
++/XTN/IF_OEHS_TB_API_CONFIG~CHECK_PLANNING_AUTHORITY
++/XTN/IF_OEHS_TB_API_CONFIG~GET_ACCOUNT_NAMESPACE_OID
++/XTN/IF_OEHS_TB_API_CONFIG~GET_APPOINTMENT_NAMESPACE_OID
++/XTN/IF_OEHS_TB_API_CONFIG~GET_PATIENT_NAMESPACE_OID
++/XTN/IF_OEHS_TB_API_CONFIG~READ_ALT_TEXT_PLANNING_OBJECT
++/XTN/IF_OEHS_TB_API_CONFIG~READ_ALT_TEXT_SCHEDULING_TYPE
++/XTN/IF_OEHS_TB_API_CONFIG~READ_ASSIGNED_PLANNING_OBJECTS
++/XTN/IF_OEHS_TB_API_CONFIG~READ_BOOKING_INSTRUCTIONS
++/XTN/IF_OEHS_TB_API_CONFIG~READ_BUILDING_UNIT
++/XTN/IF_OEHS_TB_API_CONFIG~READ_BUSINESS_PARTNER
++/XTN/IF_OEHS_TB_API_CONFIG~READ_DAY_PROGRAM
++/XTN/IF_OEHS_TB_API_CONFIG~READ_INSTITUTION
++/XTN/IF_OEHS_TB_API_CONFIG~READ_ORGANIZATIONAL_UNIT
++/XTN/IF_OEHS_TB_API_CONFIG~READ_ORG_UNIT_MAPPING
++/XTN/IF_OEHS_TB_API_CONFIG~READ_PHYSICIAN_SPECIALTIES
++/XTN/IF_OEHS_TB_API_CONFIG~READ_PLANNING_AUTHORITY
++/XTN/IF_OEHS_TB_API_CONFIG~READ_PLANNING_OBJECTS
++/XTN/IF_OEHS_TB_API_CONFIG~READ_PROCESS_NAME
++/XTN/IF_OEHS_TB_API_CONFIG~READ_REASON_FOR_CANCELLATION
++/XTN/IF_OEHS_TB_API_CONFIG~READ_SCHEDULING_TYPE
++/XTN/IF_OEHS_TB_API_CONFIG~READ_SPECIALITIES
+/XTN/IF_OEHS_TB_API_CONFIG~READ_TIMESLOT_OF_DAY_PROGRAM
+
+
+} 
+class "/XTN/CL_OEHS_TB_API_DATE_TIME"  {
+
+
++/XTN/IF_OEHS_TB_API_DATE_TIME~GET_DAYS_BETWEEN_TWO_DATES
++/XTN/IF_OEHS_TB_API_DATE_TIME~GET_DURATION
++/XTN/IF_OEHS_TB_API_DATE_TIME~GET_DURATION_OUTBOUND
+*/XTN/IF_OEHS_TB_API_DATE_TIME~GET_OFFSET_TIMESTAMP_INBOUND
+*/XTN/IF_OEHS_TB_API_DATE_TIME~GET_OFFSET_TIMESTAMP_OUTBOUND
+*/XTN/IF_OEHS_TB_API_DATE_TIME~GET_UTC_TIMESTAMP_INBOUND
+*/XTN/IF_OEHS_TB_API_DATE_TIME~GET_UTC_TIMESTAMP_OUTBOUND
+*/XTN/IF_OEHS_TB_API_DATE_TIME~GET_UTC_TIMEZONE
+
+
+} 
+class "/XTN/CL_OEHS_TB_API_FACTORY"  {
+
++  class-GET_INSTANCE
+ } 
+class "/XTN/CL_OEHS_TB_API_FHIR"  { 
++/XTN/IF_OEHS_TB_API_FHIR~GET_CONTENT
++/XTN/IF_OEHS_TB_API_FHIR~READ_APPOINTMENT
++/XTN/IF_OEHS_TB_API_FHIR~SEARCH_DOCUMENTS -CREATE_ACCESS_TOKEN
+-GET_IDENTIFIER
+-GET_PATIENT_ID
+ } 
+class "/XTN/CL_OEHS_TB_API_INJECTOR"  {
+
++  class-INJECT
++  class-RESET .
+ } 
+
+class "/XTN/CL_OEHS_TB_API_MCI"  {
+/XTN/IF_OEHS_TB_API_MCI~READ_LOG
+} 
+
+
+
+class "/XTN/CL_OEHS_TB_API_SYSTEMINFO"  {
+ } 
+class "/XTN/CX_OEHS_TB_API" extends "CX_ISH_STATIC_HANDLER" {
+
++CONSTRUCTOR
+ } 
+
+package "Adapter" {
+
+ class "/XTN/CL_OEHS_TB_API_NPAP_ADPTR"  {
+
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_ADDRESS_ID
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_BIRTHDAY
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_CITY
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_COUNTRY
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_EMAIL
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_FIRSTNAME
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_GENDER
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_HOUSE_NUMBER
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_ID
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_LASTNAME
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_MOBILE
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_POSTAL_CODE
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_STREET
++/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_TYPE  
++CONSTRUCTOR
+ } 
+
+
+class "/XTN/CL_OEHS_TB_API_NPAT_ADPTR"  {
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_ADDRESS_ID
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_BIRTHDAY
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_CITY
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_COUNTRY
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_EMAIL
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_FIRSTNAME
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_GENDER
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_HOUSE_NUMBER
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_ID
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_LASTNAME
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_MOBILE
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_POSTAL_CODE
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_STREET
+/XTN/IF_OEHS_TB_API_PAT_ADPTR~GET_TYPE
++CONSTRUCTOR
+ } 
+
+
+class "/XTN/CL_OEHS_TB_API_APPT_ADPTR"  { 
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_BOOKING_ID
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_COMMENT
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_END_DATE
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_END_TIME
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_INSTITUTION_ID
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_ORGANIZATIONAL_UNIT_ID
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_PATIENT_ID
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_PATIENT_TYPE
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_PLANNING_OBJECT_ID
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_SCHEDULING_TYPE_ID
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_SOURCE
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_START_DATE
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~GET_START_TIME
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~IS_CANCELLED
++/XTN/IF_OEHS_TB_API_APPT_ADPTR~IS_FINISHED 
++CONSTRUCTOR
+ }   
+
+note top of "/XTN/CL_OEHS_TB_API_NPAP_ADPTR"
+  Vorläufiger Patient
+end note
+
+note top of "/XTN/CL_OEHS_TB_API_NPAT_ADPTR"
+  Patient
+end note
+
+note top of "/XTN/CL_OEHS_TB_API_APPT_ADPTR"
+ Appointment
+end note
+
+}
+'END PACKAGE Adapter
+
+note top of "/XTN/CL_OEHS_TB_API_APPT"
+API für den Zugriff auf Termine
+Implementiert das Interface "/XTN/IF_OEHS_TB_API_APPT"
+
+
+
+
+
+
+ end note
+
+}
+'END PACKAGE API
+@enduml
+Business Add-Ins (BAdIs) für Timerbee
+@startuml
+package "/XTN/OEHS_TB_BADI"{
+ 
+class "/XTN/CL_FB_OEHS_TB_BADI_BI"{
+#READ_DOCUMENTATION
+} 
+class "/XTN/CX_OEHS_TB_BADI" extends "CX_ISH_STATIC_HANDLER"{
++CONSTRUCTOR
+}  
+}
+@enduml
+Business Logik für Timerbee(I. Mapper)
+
+Verschieden ausgeprägte 'Mapper'-Klassen befüllen ABAP-Strukturen mit Daten dieser Klasse:
+Also hat beispielsweise die Klasse Daten als 'APPOINTMENT' vom Typ  Referenz auf "/XTN/IF_OEHS_TB_API_APPT_ADPTR" gespeichert,  
+dann wird der Mapper für 'Slot' Methoden dieses Adapters auftrufen(z.B. GET_BOOKING_ID), um daraus die Daten für eine Appointment ID,
+in die Struktur "/XTN/OEHS_TB_DM_SLOT" zu übertragen und zurückzugeben.
+Beispielsweise in der Methode 'CANCEL'  von  "/XTN/CL_OEHS_TB_BL_APPT":
+
+
+
+
+ DATA(slot) = CAST /xtn/oehs_tb_dm_slot( NEW /xtn/cl_oehs_tb_bl_mapper_appt(
+                                                      i_institution_id = me->institution_id
+                                                      i_logger         = me->logger
+                                                      i_appointment    = appointment
+                                                    )->execute( ) ). 
+
+
+
+
+
+
+
+@startuml
+package "/XTN/OEHS_TB_BL" {
+
+class "/XTN/CL_OEHS_TB_BL_MAPPER"  {
+
++abstractEXECUTE
++CONSTRUCTOR
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_APPT" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_NAPP" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_NTMN" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_PART" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_PATI" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_PO" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
+#COPY_ADDRESS
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_PO_B" extends "/XTN/CL_OEHS_TB_BL_MAPPER_PO" {
+
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_PO_L" extends "/XTN/CL_OEHS_TB_BL_MAPPER_PO" {
+
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_PO_O" extends "/XTN/CL_OEHS_TB_BL_MAPPER_PO" {
+
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_SLOT" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+-GET_STATE_ID
+ } 
+class "/XTN/CL_OEHS_TB_BL_MAPPER_ST" extends "/XTN/CL_OEHS_TB_BL_MAPPER" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_MAPPER~EXECUTE
+ } 
+
+note top of "/XTN/CL_OEHS_TB_BL_MAPPER_PO"
+
+Mapping für Planobjekt -> Ressource mit Subklassen:
+B = Mapping für Planobjekt (Geschäftspartner) -> Ressource 
+L = Mapping für Planobjekt (baul. Einheit) -> Ressource
+O = Mapping für Planobjekt (Org.einheit) -> Ressource
+
+end note
+
+
+} 
+'End Package
+
+@enduml
+Validatoren
+
+Werden für Prüfungen von "/XTN/CL_OEHS_TB_BL_APPT" genutzt.
+Beispiel: Beim Aufruf der Methode 'CANCEL':
+
+
+
+    NEW /xtn/cl_oehs_tb_bl_val_appt_ca( i_logger      = me->logger              
+                                        i_appointment = appointment )->validate( ).      "Prüfung ob der Termin bereits storniert ist
+    NEW /xtn/cl_oehs_tb_bl_val_appt_cs( i_logger      = me->logger                      
+                                        i_appointment = appointment )->validate( ).      "Prüfung der Quelle von der ein Termin angelegt wurde
+    NEW /xtn/cl_oehs_tb_bl_val_appt_fi( i_logger      = me->logger
+                                        i_appointment = appointment )->validate( ).      "Prüfung ob der Termin in der Vergangenheit liegt
+    NEW /xtn/cl_oehs_tb_bl_val_appt_pt( i_logger      = me->logger
+                                        i_patient     = patient
+                                        i_appointment = appointment )->validate( ).       "Prüfung ob es sich um einen vorläufigen Patienten handelt
+
+Die Methoden "validate" kommunizieren das Resultat über Exceptions - heißt:: 
+Wenn keine Exception auftritt, war das Resultat OK.
+Hinweis: Eigentlich sind Exceptions nicht dazu erfunden worden Rückgabewerte zu ersetzen . Eine Prüfung hat ein Resultat - OK/NICHT OK - eine Exception iwäre hier nur angebracht, wenn ein Zustand auftritt, der die Prüfung unmöglich macht.
+
+
+
+
+
+
+@startuml
+package "/XTN/OEHS_TB_BL::VALIDATIORS" {
+ class "/XTN/CL_OEHS_TB_BL_VALIDATOR"  {
+
++abstractVALIDATE
++CONSTRUCTOR
+ } 
+class "/XTN/CL_OEHS_TB_BL_VAL_APPT_CA" extends "/XTN/CL_OEHS_TB_BL_VALIDATOR" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_VALIDATOR~VALIDATE
+ } 
+class "/XTN/CL_OEHS_TB_BL_VAL_APPT_CS" extends "/XTN/CL_OEHS_TB_BL_VALIDATOR" {
+
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_VALIDATOR~VALIDATE
+}
+ 
+class "/XTN/CL_OEHS_TB_BL_VAL_APPT_FI" extends "/XTN/CL_OEHS_TB_BL_VALIDATOR" {
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_VALIDATOR~VALIDATE
+} 
+
+class "/XTN/CL_OEHS_TB_BL_VAL_APPT_PT" extends "/XTN/CL_OEHS_TB_BL_VALIDATOR" {
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_VALIDATOR~VALIDATE
+} 
+
+class "/XTN/CL_OEHS_TB_BL_VAL_SLOT_ST" extends "/XTN/CL_OEHS_TB_BL_VALIDATOR" {
++CONSTRUCTOR
++/XTN/IF_OEHS_TB_BL_VALIDATOR~VALIDATE
+}     
+
+note top of "/XTN/CL_OEHS_TB_BL_VAL_APPT_CS"
+Prüfung der Quelle von der ein Termin angelegt wurde
+end note
+
+note top of "/XTN/CL_OEHS_TB_BL_VAL_APPT_PT"
+Prüfung ob es sich um einen vorläufigen Patienten handelt
+end note
+
+
+note top of "/XTN/CL_OEHS_TB_BL_VAL_APPT_CA"
+Prüfung ob der Termin bereits storniert ist
+end note
+
+ 
+note top of "/XTN/CL_OEHS_TB_BL_VAL_APPT_FI"
+Prüfung ob der Termin in der Vergangenheit liegt
+end note
+}
+
+
+
+
+@enduml
+Business Logik für Timerbee(II.)
+
+
+
+
+@startuml
+package "/XTN/OEHS_TB_BL" {
+
+class "/XTN/CL_OEHS_TB_BL_APPT"  {
++CANCEL
++CHANGE
++CONSTRUCTOR
++CREATE
++GET_FREE_SLOTS
+-PREPARE_BOOKING
+ } 
+class "/XTN/CL_OEHS_TB_BL_CONFIG"  {
+
++CONSTRUCTOR
++GET_PURPOSES
++GET_RESOURCES
++GET_RESOURCE_GROUPS
+ } 
+
+class "/XTN/CL_OEHS_TB_BL_METRICS"  {
+
++DETERMINE
++RENDER
+#get_endpoint
+#write_elapsed_time
+#write_error_total
+#write_max_tim_duration
+#write_min_tim_duration
+#write_total
+ } 
+
+class "/XTN/CL_OEHS_TB_BL_SYSTEM"  {
+
++CONSTRUCTOR
++GET
+ } 
+
+class "/XTN/CL_OEHS_TB_BL_TIME_RANGE"  {
+
++CONSTRUCTOR
++GET_RELATION
+-HAS_INSIDE
+ }   class "/XTN/CX_OEHS_TB_BL" extends "CX_ISH_STATIC_HANDLER" {
+
++CONSTRUCTOR
+ } 
+class "/XTN/CX_OEHS_TB_BL_APPT" extends "/XTN/CX_OEHS_TB_BL" {
+
++CONSTRUCTOR
+ } 
+class "/XTN/CX_OEHS_TB_BL_LICENSE" extends "/XTN/CX_OEHS_TB_BL" {
+
++CONSTRUCTOR
+ } 
+class "/XTN/CX_OEHS_TB_BL_MAPPER" extends "/XTN/CX_OEHS_TB_BL" {
+
++CONSTRUCTOR
+ }  
+ }
+@enduml
+
+
+
+
+REST-Schnittstellen für Timerbee
+
+@startuml
+package "/XTN/OEHS_TB_REST"{
+
+class "/XTN/CL_OEHS_TB_REST_DEFAULT" extends "CL_REST_RESOURCE" {
+
++IF_REST_RESOURCE~OPTIONS
+ } 
+class "/XTN/CL_OEHS_TB_REST_ERR_PROV" extends "CL_REST_ENTITY_PROVIDER" {
+
++CONSTRUCTOR
++IF_REST_ENTITY_PROVIDER~WRITE_TO
+ } 
+class "/XTN/CL_OEHS_TB_REST_HDL_API" extends "CL_REST_HTTP_HANDLER" {
+
++IF_REST_APPLICATION~GET_ROOT_HANDLER
+ } 
+class "/XTN/CL_OEHS_TB_REST_HDL_MTRC" extends "CL_REST_HTTP_HANDLER" {
+
++IF_REST_APPLICATION~GET_ROOT_HANDLER
+ } 
+class "/XTN/CL_OEHS_TB_REST_METRICS" extends "CL_REST_RESOURCE" {
+
++IF_REST_RESOURCE~GET
+ } 
+class "/XTN/CL_OEHS_TB_REST_PURPOSE" extends "CL_REST_RESOURCE" {
+
++IF_REST_RESOURCE~GET
+ } 
+class "/XTN/CL_OEHS_TB_REST_RESOURCE" extends "CL_REST_RESOURCE" {
+
++IF_REST_RESOURCE~GET
+ } 
+class "/XTN/CL_OEHS_TB_REST_RES_GROUP" extends "CL_REST_RESOURCE" {
++IF_REST_RESOURCE~GET
+ } 
+class "/XTN/CL_OEHS_TB_REST_SYSTEM" extends "CL_REST_RESOURCE" {
++IF_REST_RESOURCE~GET
+ } 
+
+class "/XTN/CL_OEHS_TB_REST_TIMELINE" extends "CL_REST_RESOURCE" {
++IF_REST_RESOURCE~DELETE
++IF_REST_RESOURCE~GET
++IF_REST_RESOURCE~POST
++IF_REST_RESOURCE~PUT
+-if_ishmed_mci_response_sink~send
+ }       
+}
+@enduml
+Integration Archive Development Kit (ADK)
+@startuml
+package "/XTN/OEHS_TB_ADK"{
+class /XTN/CL_IM_OEHS_TB_ADK_CASE {
+ } 
+class /XTN/CL_IM_OEHS_TB_ADK_PATIENT {
+ } 
+class /XTN/CL_IM_OEHS_TB_ADK_PROV {
+ } 
+}
+@enduml
+Integration Klinischer Arbeitsplatz
+@startuml
+package "/XTN/OEHS_TB_WP"{
+
+class "/XTN/CL_IM_OEHS_TB_WP_FUNC"  {
+ } 
+class "/XTN/CL_OEHS_TB_WP_DOC_VIEWER"  {
+
++  class-EXIT_SAPLN1PLANT_USF
++CONSTRUCTOR
++PROCESS_AFTER_INPUT
++PROCESS_BEFORE_OUTPUT .
++SHOW .
+-CLOSE .
+-CREATE_CONTROLS .
+-DISPLAY_EXCEPTION
+-ON_LINK_CLICKED
+-PREVIEW
+-REFRESH
+ } 
+class "/XTN/CX_OEHS_TB_WP" extends "CX_ISH_STATIC_HANDLER" {
+
++CONSTRUCTOR
+ } 
+
+
+}
+@enduml
+Workflow
+@startuml
+package "/XTN/OEHS_TB_WF"{
+
+class "/XTN/CL_OEHS_TB_WF_PAT_NPAP" extends "/XTN/CL_OEHS_TB_WF_PAT_ADPTR" {
+
++BI_PERSISTENT~REFRESH
++DISPLAY
+ } 
+class "  CLASS /xtn/cl_oehs_tb_wf_pat_npat"  {
+
+-bi_persistent~refresh
+-display
+ } 
+class "/XTN/CL_OEHS_TB_WF_UTL"  {
+
++  class-WRITE_LOG_BY_EXCEPTION
+ } 
+class "/XTN/CX_OEHS_TB_WF_WRONG_PTYPE" extends "CX_BO_ERROR" {
+
++CONSTRUCTOR
+ } 
+
+}
+
+@enduml
+
+
+
+
+
