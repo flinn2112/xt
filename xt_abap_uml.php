@@ -13,32 +13,44 @@
    in die Klasse ein.
    Das bedingt aber, dass das Interface vorher eingesammelt wurde - also Interfaces first.
 */
-function processCode($strFilename, $strCode, &$ht_classes, &$ht_interfaces){ 
+function processCode($strCode, &$ht_classes, &$ht_interfaces){ 
     $strClassDefs = "" ;
     $strCurrSection = "" ;  //public private usw.
     $strMethods = "" ;
     $ht_methods = array() ;    
+    $matches = array() ;
     //Zeilen splitten
     $strToken = strtok($strCode, "\n");
 
-    printf("=================================PROCESSCODE==========%s===========================================\n", $strFilename) ;
+    print("=================================PROCESSCODE==========%s===========================================\n") ;
    
     
 
     while ($strToken !== false) {
-        if( str_contains($strToken, "public section")) $strCurrSection = "+" ;
-        if( str_contains($strToken, "private section")) $strCurrSection = "-" ;
-        if( str_contains($strToken, "protected section")) $strCurrSection = "#" ;
+        if( preg_match("/public section/i", $strToken, $matches)) {
+            printf("Found public in: %s ", $strToken) ;
+             $strCurrSection = "+" ;
+        }
+        if( preg_match("/private section/i", $strToken, $matches)) {
+            printf("Found private in: %s ", $strToken) ;
+            $strCurrSection = "-" ;
+        } 
+        if( preg_match("/protected section/i", $strToken, $matches)) {
+            printf("Found protected in: %s ", $strToken) ;
+            $strCurrSection = "#" ;
+        }
         switch ($strCurrSection) {
             case "+":
-                //echo "processing public\n";
+                echo "processing public\n";
                 break;
             case "-":
-                //echo "processing private\n";
+                echo "processing private\n";
                 break;
             case "#":
-                //echo "processing protected\n";
+                echo "processing protected\n";
                 break;
+            default: 
+                $strCurrSection = "" ;
         }
 
         if( preg_match("/\s*methods\s*/i", $strToken) ){
@@ -82,16 +94,21 @@ function processCode($strFilename, $strCode, &$ht_classes, &$ht_interfaces){
 
         //  inheriting from /XTN/CL_OEHS_TB_MCI_MESSAGE_05 create public.
         //  match: inheriting from /XTN/CL_OEHS_TB_MCI_MESSAGE_05
-        if(preg_match("/inheriting from\s*[\/_A-Za-z0-9]*/", $strCode, $matches)) { //vererbt            
-            $strSuperClass = preg_replace("/\s*inheriting from\s*/", "", $matches[0]) ;
+        if(preg_match("/inheriting from\s*[\/_A-Za-z0-9]*/i", $strCode, $matches)) { //vererbt
+            $strSuperClass = preg_replace("/\s*inheriting from\s*/i", "", $matches[0]) ;
+            $strClassname = preg_replace("/\s*class\s*/i", "", $strClassname) ;
             $strClassname = sprintf("\"%s\" extends \"%s\"", $strClassname, $strSuperClass) ;
+            
+            printf("----------->>>>>>> FOUND inherit Class [%s] \n", $strClassname) ;
         }else{
+            print("----------->>>>>>> does not inherit\n") ;
+            $strClassname = preg_replace("/\s*class\s*/i", "", $strClassname) ;
             $strClassname = sprintf("\"%s\" ", $strClassname) ;
         }
 
-        if(preg_match("/CL_ISHMED|UNIT_TEST|LCL_|LTC_|CL_ISH/i", $strClassname, $matches)) { 
+        if(preg_match("/^CL_ISHMED|^UNIT_TEST|^LCL_|^LTC_|^CL_ISH/i", $strClassname, $matches)) { 
             //die nicht
-            print("Filtered out %s\n" );
+            printf("Filtered out %s\n", $strClassname );
         }
         else{
 
@@ -135,14 +152,14 @@ function processCode($strFilename, $strCode, &$ht_classes, &$ht_interfaces){
     
 */
 function createClass($strContents, $ht_interfaces, $strPrefix,  //für interfaces
-                           $bMethodsOnly){
+                           $bMethodsOnly, $bDebug){
 
     $strMethods = "" ;
     $strContents = preg_replace("/;;/", ";", $strContents) ; //leere weg
-    printf("createClass - received: %s\n", $strContents) ;
+    if($bDebug) printf("createClass - received: %s\n", $strContents) ;
     $rParts = explode(";", $strContents) ;
     if( 0 == count($rParts)  ){ //keine Methoden drin
-        printf("Parts empty: [%s]\n", $strContents ) ;
+        if($bDebug)  printf("Parts empty: [%s]\n", $strContents ) ;
     }else{
         
         //fängt mit dem 2.ten Element an, erstes ist die Klasse.
@@ -153,15 +170,15 @@ function createClass($strContents, $ht_interfaces, $strPrefix,  //für interface
             //möglicherweise referiert der Eintrag ein Interface
             $strName = preg_replace("/^[\+\-\#]/", "", $rParts[$i]); //die Modifier könnten drin stehen - muss weg
             if( isset($ht_interfaces[$strName])){                
-                printf("createClass: Found Interface [%s] Value: %s\n", $strName, $ht_interfaces[$strName] ) ;
-                $strMethods = $strMethods. createClass($ht_interfaces[$strName], $ht_interfaces, $rParts[$i]. "~", TRUE) ;
-                printf("createClass: Appending Interface Methods [%s] Pref: %s\n", $strMethods, $rParts[$i] ) ;
+                if($bDebug) printf("createClass: Found Interface [%s] Value: %s\n", $strName, $ht_interfaces[$strName] ) ;
+                $strMethods = $strMethods. createClass($ht_interfaces[$strName], $ht_interfaces, $rParts[$i]. "~", TRUE, $bDebug) ;
+                if($bDebug) printf("createClass: Appending Interface Methods [%s] Pref: %s\n", $strMethods, $rParts[$i] ) ;
             }else{
                 if( empty($strPrefix))
                     $strMethods =  $strMethods. $rParts[$i]. "\n" ;
                 else
                     $strMethods =  $strMethods. $strPrefix. $rParts[$i]. "\n" ;
-                printf("createClass: Part [%s]\n", $rParts[$i] ) ;
+                    if($bDebug) printf("createClass: Part [%s]\n", $rParts[$i] ) ;
             }
             
         }        
@@ -247,9 +264,10 @@ function collectStuff($strPath, $strPackageName){
                 }else{
                     $strContentAll = $strContentAll. file_get_contents($fName) ;
                 }
-            }
+            } //FOR
             $strContentAll = $strContentInterfaces. "\n". $strContentAll;
-            processCode($strPackageName, $strContentAll, $ht_classes, $ht_interfaces) ; 
+            printf("%s\n",  $strContentAll) ;
+            processCode($strContentAll, $ht_classes, $ht_interfaces) ; 
              
                 
 //break ;   
@@ -268,11 +286,15 @@ function collectStuff($strPath, $strPackageName){
 
     //sort($ht_classes) ;
     printf("=========================================%s=============================================\n", $strPackageName) ;
+    printf("package \"%s\" {\n", $strPackageName) ; 
     foreach ($ht_classes as $x){
             //printf("[%d] ---  %s\n", $iCount++, $x) ;
-            $strClasses = createClass($x, $ht_interfaces, NULL, FALSE) ;
+            $strClasses = createClass($x, $ht_interfaces, NULL, FALSE,
+             FALSE //DEBUG
+             ) ;
             print($strClasses) ;
         }
+        print("\n}\n") ; 
     print("======================================================================================\n") ;    
 }
 
@@ -311,7 +333,7 @@ while (($file = $d->read()) !== false){
 
 //collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_ADK_XTN", "OEHS_TB_ADK") ;
 
-collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_API_XTN", "OEHS_TB_API") ;
+//collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_API_XTN", "OEHS_TB_API") ;
 //collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_BADI_XTN", "OEHS_TB_BADI") ;
 
 //collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_NM_BL_XTN", "OEHS_NM_BL_XTN") ;
@@ -321,6 +343,50 @@ collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_API_XTN", "OEHS_TB_API") 
 //collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_WP_XTN",  "OEHS_TB_WP_XTN") ;
 
 //collectStuff("C:\Users\kempf\Documents\ABAP\XTNOEHS_TB_WF_XTN",  "OEHS_TB_WF_XTN") ;
+
+
+//collectStuff("C:\\temp\\RCC\\XTNRCC_PMD_XTN", "RCC_PMD") ;
+
+//RCC
+//collectStuff("C:\\temp\\RCC\\XTNRCC_BASE_XTN", "RCC_BASE") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_APP_IN_XTN", "RCCAPP_IN") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_APP_OUT_XTN", "RCCAPP_OUT") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_BAR_XTN", "RCCAPP_BAR") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_CTX_XTN", "RCC_CTXT") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_PMD_XTN", "RCC_PMD") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_ORD_XTN", "RCC_ORD") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_SYS_XTN", "RCC_SYS") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_OKR_XTN", "RCC_OKR") ;
+
+//collectStuff("C:\\temp\\RCC\\XTNRCC_MSD_XTN", "RCC_MSD") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_MSA_XTN", "RCC_MSA") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_MCP_XTN", "RCC_MCP") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_MCI_XTN", "RCC_MCI") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_MCI_EHF_XTN", "RCC_EHF") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_MAP_XTN", "RCC_MAP") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_IAP_XTN", "RCC_IAP") ;
+//collectStuff("C:\\temp\\RCC\\XTNRCC_HPS_251_XTN", "RCC_IAP") ; //nicht aussagekräftig - auslassen
+//collectStuff("C:\\temp\\RCC\\XTNRCC_HCM_XTN", "RCC_HCM") ; 
+//collectStuff("C:\\temp\\RCC\\XTNRCC_HCM_BAR_XTN", "RCC_HCM_BAR") ; 
+
+
+//collectStuff("C:\\temp\\RCC\\XTNRCC_DRX_TIMES_XTN", "RCC_DRX_TIMES") ; 
+//collectStuff("C:\\temp\\RCC\\XTNRCC_DRX_TEAM_XTN", "RCC_DRX_TEAM") ; 
+
+
+//collectStuff("C:\\temp\\RCC\\XTNRCC_DRX_SD_XTN", "RCC_DRX_SD") 
+//collectStuff("C:\\temp\\RCC\\XTNRCC_DRX_DOC_XTN", "RCC_DRX_DOC") ;  
+//collectStuff("C:\\temp\\RCC\\XTNRCC_DOC_XTN", "RCC_DOC") ; 
+//collectStuff("C:\\temp\\RCC\\XTNRCC_DFT_XTN", "RCC_DFT") ;   
+
+
+//ollectStuff("C:\\temp\\FHIR\\XTNFHIR_RESOURCE_XTN", "FHIR_RESOURCES") ; 
+//collectStuff("C:\\temp\\FHIR\\XTNFHIR_REST_XTN", "FHIR_REST") ;   
+    
+//collectStuff("C:\\temp\\OCI\\XTN", "OCI") ;
+collectStuff("C:\\temp\\OCI\\XTNOCI_BASE_XTN", "OCI_BASE") ;
+collectStuff("C:\\temp\\OCI\\XTNOCI_COM_XTN", "OCI_COM") ;
+
 
 /*
 
