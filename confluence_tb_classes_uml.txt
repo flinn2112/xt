@@ -1,3 +1,8 @@
+HINWEIS:
+
+Um die Klassendiagramme etwas übersichtlicher zu halten, wurden NUR DIE KLASSENMETHODEN in die Diagramme übernommen.
+Dies ist bei der Betrachtung einzubeziehen.
+
 MCI-Komponenten für Timerbee
 @startuml
 
@@ -54,7 +59,7 @@ note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE"
 Timerbee MCI-Nachricht
 end note
 
- class "/XTN/CL_OEHS_TB_MCI_MESSAGE_01" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
+class "/XTN/CL_OEHS_TB_MCI_MESSAGE_01" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
 
 +CONSTRUCTOR
 +GET_DATA
@@ -197,6 +202,19 @@ class "/XTN/CX_OEHS_TB_MCI" extends "CX_ISHMED_MCI" {
 
 }
 @enduml
+Transformerklassen
+
+Die Klassen sind zwar im MCI Paket, wurden aber zur Verbesserung der Übersichtlichkeit in ein separates Diagramm ausgelagert.
+Anm.:
+Ein Anti-Beispiel für effiziente Wiederverwend- und Wartbarkeit, sind die Benennungen der Klassen - 
+Es ist initial nur schwer ersichtlich, welchem Zweck die Klassen dienen, und in welchem Zusammenhang diese stehen.
+Eine Namensgebung wie   CL_OEHS_TB_MCI_PURPOSE_TF - statt nur CL_OEHS_TB_MCI_PURPOSE hätte dem Betrachter sofort die Idee der jeweiligen Klasse vermittelt.
+Auch klar würde dadurch ein Verständnis, dass sich diese Klassen in einer Gruppe von gleichartigen Klassen befinden.
+Hier hätte auch eine Vererbung angebracht sein können, um klar herauszustellen, dass es sich hier um eine Gruppierung von Funktionalität handelt.
+Eine Oberklasse CL_OEHS_TB_MCI_TRANSFORMER von der der Rest abgeleitet wird.
+Im übrigen ist genau diese Vorgehensweise bei den Validatorenklassen angewandt worden(s.U.). 
+Diese Klassen haben 'VAL' im Namen und sind alle von /XTN/CL_OEHS_TB_BL_VALIDATOR abgeleitet. 
+Diese Anmerkung nur für evt. künftige Entwicklungen.
 
 
 
@@ -437,13 +455,7 @@ end note
 note top of "/XTN/CL_OEHS_TB_API_APPT"
 API für den Zugriff auf Termine
 Implementiert das Interface "/XTN/IF_OEHS_TB_API_APPT"
-
-
-
-
-
-
- end note
+end note
 
 }
 'END PACKAGE API
@@ -643,6 +655,98 @@ end note
 @enduml
 Business Logik für Timerbee(II.)
 
+Hinweis 3/2024 zur Prüfung der Wiederverwendbarkeit von Timerbee-Klassen für ein mögliches Projekt bei UK Mainz.
+Die meisten Klassen sind als 'FINAL' markiert, das heisst diese erlauben keine weitere Ableitung. 
+Nicht klar ist, ob der Autor diese Entscheidung überlegt getroffen, oder einfach bei der Anlage der Klasse den Default-Wert übernommen hat.
+Das Merkmal 'FINAL' allein verhindert noch nicht die Wiederverwendung - allerdings die Eigenschaft 'PRIVATE' oder 'PROTECTED' einer Methode oder Merkmal schon.
+Hier: 
+In Klasse /XTN/CL_OEHS_TB_BL_APPT ist die Methode PREPARE_BOOKING als 'Private' ausgezeichnet - was sowohl bei einer Vererbung(die aber schon durch Verwendung von FINAL verhindert ist),
+als auch bei einer Aggregation die Verwendung unmöglich macht. Diese Methode ist 'üppig' mit Code ausgestattet.
+Bei der einzig verbleibenden Option - die Neuanlage mit kopiertem Coding der Methode ergeben sich wiederum Nachteile bei der Wartbarkeit.
+Evt. könnte die Sichtbarkeit der Methode von 'Private' auf 'Public' in Betracht gezogen werden.
+Auch hier - hat sich der Autor etwas tieferes dabei gedacht? - ist nicht bekannt.
+Um die Entscheidung zu Unterstützen wird folgend der Ablauf der Methode als Sequenz dargestellt.
+
+
+
+
+
+
+
+Der immer wiederkehrende Aufruf von 'get_instance' ist etwas irritierend - schadet aber nicht wirklich, weil es sich um ein SINGLETON handelt, also gepuffert ist. - Wird nicht jedesmal eine neue Erzeugung auslösen.
+Das Coding ist im neuen ABAP verfasst und macht gebrauch von verketteten Aufrufen - was sehr Chic ist, allerdings die Zusammenhänge, Rückgabetypen verschleiert und damit eine Wartbarkeit erheblich erschwert.
+Es behindert zudem  das Debugging, da hier ein 'STEP INTO' erschwert wird.
+
+
+
+
+
+
+@startuml
+skinparam backgroundColor #b3b3cc
+actor UNKNOWN 
+activate "/XTN/CL_OEHS_TB_BL_APPT"
+activate "/XTN/CL_OEHS_TB_API_FACTORY"
+
+
+UNKNOWN -> "/XTN/CL_OEHS_TB_BL_APPT": CREATE
+
+
+"/XTN/CL_OEHS_TB_BL_APPT" -> "/XTN/CL_OEHS_TB_BL_APPT": Create
+
+
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY" : get_instance
+
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY"   :get_api_date_time 
+note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_DATE_TIME"
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME"   :get_offset_timestamp_inbound
+
+
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME"   :get_duration
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME" : get_instance( again?)
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME"   :get_api_configuration"
+
+note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_CONFIGURATION"
+
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :read_assigned_planning_objects
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :read_planning_objects
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :read_scheduling_type
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :read_planning_authority
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :check_planning_authority
+
+
+
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY"   :get_instance
+
+
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY"   :get_api_appointment
+note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_APPOINTMENT"
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_APPOINTMENT"   :read_appointments
+"/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_APPOINTMENT"   : List of Appointments
+
+
+
+
+
+
+
+
+
+@enduml
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -688,22 +792,43 @@ class "/XTN/CL_OEHS_TB_BL_TIME_RANGE"  {
 +CONSTRUCTOR
 +GET_RELATION
 -HAS_INSIDE
- }   class "/XTN/CX_OEHS_TB_BL" extends "CX_ISH_STATIC_HANDLER" {
+ }   
+class "/XTN/CX_OEHS_TB_BL" extends "CX_ISH_STATIC_HANDLER" {
 
 +CONSTRUCTOR
  } 
+
+
+
 class "/XTN/CX_OEHS_TB_BL_APPT" extends "/XTN/CX_OEHS_TB_BL" {
 
 +CONSTRUCTOR
  } 
+
+note top of "/XTN/CX_OEHS_TB_BL_APPT"
+Fehler beim Anlegen/Ändern/Löschen von Terminen
+end note
+
+
 class "/XTN/CX_OEHS_TB_BL_LICENSE" extends "/XTN/CX_OEHS_TB_BL" {
 
 +CONSTRUCTOR
  } 
+
+note top of "/XTN/CX_OEHS_TB_BL_LICENSE"
+Keine Lizenz für die Einrichtung vorhanden
+end note
+
+
 class "/XTN/CX_OEHS_TB_BL_MAPPER" extends "/XTN/CX_OEHS_TB_BL" {
 
 +CONSTRUCTOR
- }  
+ }
+note top of "/XTN/CX_OEHS_TB_BL_MAPPER"
+Ausnahme beim Mapping von Strukturen
+end note
+
+
  }
 @enduml
 
