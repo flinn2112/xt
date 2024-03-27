@@ -1,12 +1,31 @@
 HINWEIS:
 
-Um die Klassendiagramme etwas übersichtlicher zu halten, wurden NUR DIE KLASSENMETHODEN in die Diagramme übernommen.
+Um die Klassendiagramme etwas übersichtlicher zu halten, wurden NUR DIE METHODEN DER KLASSEN in die Diagramme übernommen.
 Dies ist bei der Betrachtung einzubeziehen.
 
 MCI-Komponenten für Timerbee
+Messages
+
+Messages sind numeriert und nicht benannt - das macht die Lesbarkeit nicht wirklich einfach - im Diagramm werden die Namen den Messages zugeordnet.
+Wichtig an den Objekten ist, das die Message-Klassen 01 bis 05 in den HTTP Handlern(/XTN/CL_OEHS_TB_REST_*) erzeugt werden.
+Die Oberklasse wird von MCI Receive erzeugt.
+
+
+
+Das Coding für diese REST-Methoden ist immer identisch - bis auf die Nummer im Namen der, zu erzeugenden, Klasse.
+ NEW /xtn/cl_oehs_tb_mci_engine( i_process_name        = /xtn/if_oehs_tb_constants=>process_name-purpose
+                                       i_message       = NEW /xtn/cl_oehs_tb_mci_message_04( i_institution_id = CONV #( institution_id )
+                                       i_request       = me->mo_request )
+                                       i_response_sink = me
+ )->do( ). 
+
+
+
+
+
+
+
 @startuml
-
-
 
 package "/XTN/OEHS_TB_MCI"{ 
 
@@ -57,6 +76,7 @@ class "/XTN/CL_OEHS_TB_MCI_MESSAGE"  {
 
 note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE"
 Timerbee MCI-Nachricht
+Instanzen werden in der Implementierung von if_ishmed_mci_start_connector~receive erzeugt.
 end note
 
 class "/XTN/CL_OEHS_TB_MCI_MESSAGE_01" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
@@ -70,6 +90,11 @@ class "/XTN/CL_OEHS_TB_MCI_MESSAGE_01" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
 
 note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_01"
 MCI-Nachricht für Endpunkt "System"
+Instanzen werden erzeugt von 
+CL_OEHS_TB_REST_SYSTEM(abgeleitet von CL_REST_RESOURCE) if_rest_resource~get.
+
+
+
 end note
 
 class "/XTN/CL_OEHS_TB_MCI_MESSAGE_02" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
@@ -107,31 +132,15 @@ end note
 
 
 class "/XTN/CL_OEHS_TB_MCI_MESSAGE_05" extends "/XTN/CL_OEHS_TB_MCI_MESSAGE" {
-
-+IF_ISHMED_OBJECT~FINALIZE
-+IF_ISHMED_MCI_MESSAGE~DISPLAY
-+IF_ISHMED_MCI_MESSAGE~EDIT
-+GET_ENDPOINT
-+GET_INSTITUTION_ID
-+GET_METHOD
-+GET_RESPONSE
-+GET_URI_ATTRIBUTES
-+GET_URI_FRAGMENT
-+GET_URI_PATH
-+GET_URI_QUERY_PARAMETERS
-+GET_URI_SEGMENTS
-+SET_RESPONSE
-+ADJUST_BEFORE_DISPLAY
 CONSTRUCTOR
 +GET_DATA
 +SET_DATA
-
 +CONSTRUCTOR
-#ADJUST_BEFORE_DISPLAY
- } 
+} 
 note top of "/XTN/CL_OEHS_TB_MCI_MESSAGE_05"
 
-MCI-Nachricht für Endpunkt "Timeline"
+MCI-Nachricht für Endpunkt "Timeline" 
+Instanzen werden von if_ishmed_mci_transformer~transform erzeugt.
 
 end note
 
@@ -698,7 +707,7 @@ UNKNOWN -> "/XTN/CL_OEHS_TB_BL_APPT": CREATE
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY" : get_instance
 
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY"   :get_api_date_time 
-note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_DATE_TIME"
+note right of "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_DATE_TIME"
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME"   :get_offset_timestamp_inbound
 
 
@@ -706,7 +715,7 @@ note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_DATE_TIME"
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME" : get_instance( again?)
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_DATE_TIME"   :get_api_configuration"
 
-note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_CONFIGURATION"
+note right of "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_CONFIGURATION"
 
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :read_assigned_planning_objects
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_CONFIGURATION"   :read_planning_objects
@@ -720,7 +729,7 @@ note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_CONFIGURATION"
 
 
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/CL_OEHS_TB_API_FACTORY"   :get_api_appointment
-note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_APPOINTMENT"
+note right of "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_APPOINTMENT"
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_APPOINTMENT"   :read_appointments
 "/XTN/CL_OEHS_TB_BL_APPT" <-> "/XTN/IF_OEHS_TB_API_APPOINTMENT"   : List of Appointments
 
@@ -737,6 +746,7 @@ note over "/XTN/CL_OEHS_TB_BL_APPT": "/XTN/IF_OEHS_TB_API_APPOINTMENT"
 
 
 
+Die Methode 'PREPARE_BOOKING' ist in einem Testreport von AHempel verwendet(ZTEST_GENERATE_APPOINTMENTS).
 
 
 
@@ -837,10 +847,57 @@ end note
 
 REST-Schnittstellen für Timerbee
 
+Die Handler sind in Transaktion SICF festgelegt:
+
+
+
+
+In der Methode GET_ROOT_HANDLER von /XTN/CL_OEHS_TB_REST_HDL_API werden die Routes zu den jeweiligen Methoden registriert.
+Die Zuordnung erfolgt über den Klassennamen, der als Konstante in /XTN/IF_OEHS_TB_CONSTANTS eingetragen wurde:
+
+
+
+
+router->attach( iv_template      = /xtn/if_oehs_tb_constants=>template-resource_group
+                 iv_handler_class = /xtn/if_oehs_tb_constants=>handler_class-resource_group ). 
+BEGIN OF handler_class,
+      system         TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_SYSTEM'     ##no_text,
+      resource_group TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_RES_GROUP'  ##no_text,
+      resource       TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_RESOURCE'   ##no_text,
+      purpose        TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_PURPOSE'    ##no_text,
+      timeline       TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_TIMELINE'   ##no_text,
+      default        TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_DEFAULT'    ##no_text,
+      metrics        TYPE seoclsname VALUE '/XTN/CL_OEHS_TB_REST_METRICS'    ##no_text,
+END OF handler_class .
+
+Sollte eine Erweiterung erforderlich werden(z.B. f. Terminbuchungsliste zu einem Patienten) kann /XTN/IF_OEHS_TB_CONSTANTS um eine neue Methode ergänzt, und im Coding von GET_ROOT_HANDLER eingetragen werden.
+
+
+
+
 @startuml
+
+
+package SICF{
+  class "/XTN/CL_OEHS_TB_REST_HDL_API" extends "CL_REST_HTTP_HANDLER" {
+
++IF_REST_APPLICATION~GET_ROOT_HANDLER
+ }
+
+
+ class "/XTN/CL_OEHS_TB_REST_HDL_MTRC" extends "CL_REST_HTTP_HANDLER" {
+
++IF_REST_APPLICATION~GET_ROOT_HANDLER
+ }  
+   
+}
+
+
 package "/XTN/OEHS_TB_REST"{
 
-class "/XTN/CL_OEHS_TB_REST_DEFAULT" extends "CL_REST_RESOURCE" {
+
+
+ class "/XTN/CL_OEHS_TB_REST_DEFAULT" extends "CL_REST_RESOURCE" {
 
 +IF_REST_RESOURCE~OPTIONS
  } 
@@ -849,14 +906,8 @@ class "/XTN/CL_OEHS_TB_REST_ERR_PROV" extends "CL_REST_ENTITY_PROVIDER" {
 +CONSTRUCTOR
 +IF_REST_ENTITY_PROVIDER~WRITE_TO
  } 
-class "/XTN/CL_OEHS_TB_REST_HDL_API" extends "CL_REST_HTTP_HANDLER" {
 
-+IF_REST_APPLICATION~GET_ROOT_HANDLER
- } 
-class "/XTN/CL_OEHS_TB_REST_HDL_MTRC" extends "CL_REST_HTTP_HANDLER" {
 
-+IF_REST_APPLICATION~GET_ROOT_HANDLER
- } 
 class "/XTN/CL_OEHS_TB_REST_METRICS" extends "CL_REST_RESOURCE" {
 
 +IF_REST_RESOURCE~GET
@@ -884,15 +935,31 @@ class "/XTN/CL_OEHS_TB_REST_TIMELINE" extends "CL_REST_RESOURCE" {
 -if_ishmed_mci_response_sink~send
  }       
 }
+
+
+
+
+
 @enduml
 Integration Archive Development Kit (ADK)
 @startuml
 package "/XTN/OEHS_TB_ADK"{
 class /XTN/CL_IM_OEHS_TB_ADK_CASE {
- } 
++IF_EX_ISHMED_ADK_OBJECT_TYPE-DEFINE
++IF_EX_ISHMED_ADK_OBJECT_TYPE-READ
+
+} 
 class /XTN/CL_IM_OEHS_TB_ADK_PATIENT {
+
++IF_EX_ISHMED_ADK_OBJECT_TYPE-DEFINE
++IF_EX_ISHMED_ADK_OBJECT_TYPE-READ
+
  } 
 class /XTN/CL_IM_OEHS_TB_ADK_PROV {
+
++IF_EX_ISHMED_ADK_OBJECT_TYPE-DEFINE
++IF_EX_ISHMED_ADK_OBJECT_TYPE-READ
+
  } 
 }
 @enduml
